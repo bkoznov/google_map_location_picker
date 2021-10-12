@@ -240,7 +240,7 @@ class MapPickerState extends State<MapPicker> {
                         _placeId = data["placeId"];
                         return Text(
                           _address ??
-                              S.of(context)?.unnamedPlace ??
+                              // S.of(context)?.unnamedPlace ??
                               'Unnamed place',
                           style: TextStyle(fontSize: 18),
                         );
