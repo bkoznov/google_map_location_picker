@@ -22,46 +22,46 @@ import 'utils/location_utils.dart';
 class LocationPicker extends StatefulWidget {
   LocationPicker(
     this.apiKey, {
-    Key key,
-    this.initialCenter,
-    this.initialZoom,
-    this.requiredGPS,
-    this.myLocationButtonEnabled,
-    this.layersButtonEnabled,
-    this.automaticallyAnimateToCurrentLocation,
+    Key? key,
+    required this.initialCenter,
+    required this.initialZoom,
+    required this.requiredGPS,
+    required this.myLocationButtonEnabled,
+    required this.layersButtonEnabled,
+    required this.automaticallyAnimateToCurrentLocation,
     this.mapStylePath,
-    this.appBarColor,
-    this.searchBarBoxDecoration,
-    this.hintText,
-    this.resultCardConfirmIcon,
-    this.resultCardAlignment,
-    this.resultCardDecoration,
-    this.resultCardPadding,
-    this.countries,
-    this.language,
-    this.desiredAccuracy,
+    required this.appBarColor,
+    required this.searchBarBoxDecoration,
+    required this.hintText,
+    required this.resultCardConfirmIcon,
+    required this.resultCardAlignment,
+    required this.resultCardDecoration,
+    required this.resultCardPadding,
+    required this.countries,
+    required this.language,
+    required this.desiredAccuracy,
   });
 
   final String apiKey;
 
   final LatLng initialCenter;
   final double initialZoom;
-  final List<String> countries;
+  final List<String>? countries;
 
   final bool requiredGPS;
   final bool myLocationButtonEnabled;
   final bool layersButtonEnabled;
   final bool automaticallyAnimateToCurrentLocation;
 
-  final String mapStylePath;
+  String? mapStylePath;
 
   final Color appBarColor;
-  final BoxDecoration searchBarBoxDecoration;
-  final String hintText;
-  final Widget resultCardConfirmIcon;
-  final Alignment resultCardAlignment;
-  final Decoration resultCardDecoration;
-  final EdgeInsets resultCardPadding;
+  BoxDecoration? searchBarBoxDecoration;
+  String? hintText;
+  Widget? resultCardConfirmIcon;
+  Alignment? resultCardAlignment;
+  Decoration? resultCardDecoration;
+  EdgeInsets? resultCardPadding;
 
   final String language;
 
@@ -73,12 +73,12 @@ class LocationPicker extends StatefulWidget {
 
 class LocationPickerState extends State<LocationPicker> {
   /// Result returned after user completes selection
-  LocationResult locationResult;
+  LocationResult? locationResult;
 
   /// Overlay to display autocomplete suggestions
-  OverlayEntry overlayEntry;
+  OverlayEntry? overlayEntry;
 
-  List<NearbyPlace> nearbyPlaces = List();
+  List<NearbyPlace> nearbyPlaces = [];
 
   /// Session token required for autocomplete API call
   String sessionToken = Uuid().generateV4();
@@ -94,7 +94,7 @@ class LocationPickerState extends State<LocationPicker> {
   /// Hides the autocomplete overlay
   void clearOverlay() {
     if (overlayEntry != null) {
-      overlayEntry.remove();
+      overlayEntry!.remove();
       overlayEntry = null;
     }
   }
@@ -112,15 +112,17 @@ class LocationPickerState extends State<LocationPicker> {
 
     if (place.length < 1) return;
 
-    final RenderBox renderBox = context.findRenderObject();
-    Size size = renderBox.size;
+    final RenderBox? renderBox =
+        context.findAncestorRenderObjectOfType<RenderBox>();
+    Size? size = renderBox?.size;
 
-    final RenderBox appBarBox = appBarKey.currentContext.findRenderObject();
+    final RenderBox? appBarBox =
+        appBarKey.currentContext?.findAncestorRenderObjectOfType<RenderBox>();
 
     overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        top: appBarBox.size.height,
-        width: size.width,
+        top: appBarBox?.size.height,
+        width: size?.width,
         child: Material(
           elevation: 1,
           child: Container(
@@ -145,8 +147,7 @@ class LocationPickerState extends State<LocationPicker> {
         ),
       ),
     );
-
-    Overlay.of(context).insert(overlayEntry);
+    if (overlayEntry != null) Overlay.of(context)?.insert(overlayEntry!);
 
     autoCompleteSearch(place);
   }
@@ -159,7 +160,7 @@ class LocationPickerState extends State<LocationPicker> {
 
     // Currently, you can use components to filter by up to 5 countries. from https://developers.google.com/places/web-service/autocomplete
     String regionParam = countries?.isNotEmpty == true
-        ? "&components=country:${countries.sublist(0, min(countries.length, 5)).join('|country:')}"
+        ? "&components=country:${countries?.sublist(0, min(countries?.length ?? 0, 5)).join('|country:')}"
         : "";
 
     var endpoint =
@@ -169,8 +170,8 @@ class LocationPickerState extends State<LocationPicker> {
             "language=${widget.language}";
 
     if (locationResult != null) {
-      endpoint += "&location=${locationResult.latLng.latitude}," +
-          "${locationResult.latLng.longitude}";
+      endpoint += "&location=${locationResult!.latLng?.latitude}," +
+          "${locationResult!.latLng?.longitude}";
     }
 
     LocationUtils.getAppHeaders()
@@ -199,7 +200,7 @@ class LocationPickerState extends State<LocationPicker> {
             aci.length = t['matched_substrings'][0]['length'];
 
             suggestions.add(RichSuggestion(aci, () {
-              decodeAndSelectPlace(aci.id);
+              if (aci?.id != null) decodeAndSelectPlace(aci.id!);
             }));
           }
         }
@@ -240,17 +241,19 @@ class LocationPickerState extends State<LocationPicker> {
 
   /// Display autocomplete suggestions with the overlay.
   void displayAutoCompleteSuggestions(List<RichSuggestion> suggestions) {
-    final RenderBox renderBox = context.findRenderObject();
-    Size size = renderBox.size;
+    final RenderBox? renderBox =
+        context.findAncestorRenderObjectOfType<RenderBox>();
+    Size? size = renderBox?.size;
 
-    final RenderBox appBarBox = appBarKey.currentContext.findRenderObject();
+    final RenderBox? appBarBox =
+        appBarKey.currentContext?.findAncestorRenderObjectOfType<RenderBox>();
 
     clearOverlay();
 
     overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        width: size.width,
-        top: appBarBox.size.height,
+        width: size?.width,
+        top: appBarBox?.size.height,
         child: Material(
           elevation: 1,
           child: Column(
@@ -259,8 +262,7 @@ class LocationPickerState extends State<LocationPicker> {
         ),
       ),
     );
-
-    Overlay.of(context).insert(overlayEntry);
+    if (overlayEntry != null) Overlay.of(context)?.insert(overlayEntry!);
   }
 
   /// Utility function to get clean readable name of a location. First checks
@@ -351,10 +353,8 @@ class LocationPickerState extends State<LocationPicker> {
 //          responseJson['results'][0]['address_components'][1]['short_name'];
 
       setState(() {
-        locationResult = LocationResult();
-        locationResult.address = road;
-        locationResult.latLng = latLng;
-        locationResult.placeId = placeId;
+        locationResult =
+            LocationResult(address: road, latLng: latLng, placeId: placeId);
       });
     }
   }
@@ -362,7 +362,7 @@ class LocationPickerState extends State<LocationPicker> {
   /// Moves the camera to the provided location and updates other UI features to
   /// match the location.
   void moveToLocation(LatLng latLng) {
-    mapKey.currentState.mapController.future.then((controller) {
+    mapKey.currentState?.mapController.future.then((controller) {
       controller.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
@@ -442,24 +442,24 @@ class LocationPickerState extends State<LocationPicker> {
 /// set [automaticallyAnimateToCurrentLocation] to false.
 ///
 ///
-Future<LocationResult> showLocationPicker(
+Future<LocationResult?> showLocationPicker(
   BuildContext context,
   String apiKey, {
   LatLng initialCenter = const LatLng(45.521563, -122.677433),
   double initialZoom = 16,
   bool requiredGPS = false,
-  List<String> countries,
+  List<String>? countries,
   bool myLocationButtonEnabled = false,
   bool layersButtonEnabled = false,
   bool automaticallyAnimateToCurrentLocation = true,
-  String mapStylePath,
+  String? mapStylePath,
   Color appBarColor = Colors.transparent,
-  BoxDecoration searchBarBoxDecoration,
-  String hintText,
-  Widget resultCardConfirmIcon,
-  AlignmentGeometry resultCardAlignment,
-  EdgeInsetsGeometry resultCardPadding,
-  Decoration resultCardDecoration,
+  BoxDecoration? searchBarBoxDecoration,
+  String? hintText,
+  Widget? resultCardConfirmIcon,
+  AlignmentGeometry? resultCardAlignment,
+  EdgeInsetsGeometry? resultCardPadding,
+  Decoration? resultCardDecoration,
   String language = 'en',
   LocationAccuracy desiredAccuracy = LocationAccuracy.best,
 }) async {
@@ -481,8 +481,10 @@ Future<LocationResult> showLocationPicker(
           hintText: hintText,
           searchBarBoxDecoration: searchBarBoxDecoration,
           resultCardConfirmIcon: resultCardConfirmIcon,
-          resultCardAlignment: resultCardAlignment,
-          resultCardPadding: resultCardPadding,
+          resultCardAlignment:
+              resultCardAlignment?.resolve(Directionality.of(context)),
+          resultCardPadding:
+              resultCardPadding?.resolve(Directionality.of(context)),
           resultCardDecoration: resultCardDecoration,
           countries: countries,
           language: language,

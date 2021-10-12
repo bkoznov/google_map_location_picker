@@ -11,9 +11,9 @@ class LocationResult {
   String placeId;
 
   /// Latitude/Longitude of the selected location.
-  LatLng latLng;
+  LatLng? latLng;
 
-  LocationResult({this.latLng, this.address, this.placeId});
+  LocationResult({this.latLng, required this.address, required this.placeId});
 
   @override
   String toString() {

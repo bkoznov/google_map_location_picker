@@ -10,12 +10,12 @@ typedef WidgetBuilder<T> = Widget Function(BuildContext context, T snapshot);
 
 class FutureLoadingBuilder<T> extends StatefulWidget {
   const FutureLoadingBuilder({
-    Key key,
-    @required this.future,
+    Key? key,
+    required this.future,
     this.initialData,
-    @required this.builder,
+    required this.builder,
     this.mutable = false,
-    this.loadingIndicator,
+    required this.loadingIndicator,
   })  : assert(builder != null),
         super(key: key);
 
@@ -35,7 +35,7 @@ class FutureLoadingBuilder<T> extends StatefulWidget {
   /// provided to the [builder] will become null, regardless of [initialData].
   /// (The error itself will be available in [AsyncSnapshot.error], and
   /// [AsyncSnapshot.hasError] will be true.)
-  final T initialData;
+  final T? initialData;
 
   /// default is true
   ///
@@ -50,7 +50,7 @@ class FutureLoadingBuilder<T> extends StatefulWidget {
 }
 
 class _FutureLoadingBuilderState<T> extends State<FutureLoadingBuilder<T>> {
-  Future<T> future;
+  Future<T>? future;
 
   @override
   void initState() {
